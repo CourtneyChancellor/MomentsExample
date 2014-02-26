@@ -1,0 +1,96 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+
+
+\begin{document}
+
+To begin, what is a moment? A moment is, quite simply, the expected value of a random variable, $z$, raised to a certain power. An ``expectation'' is a specifically defined function in statistics, $E\left[f(z)\right]=\int f(z) P(z) dz$ when in continuous spaces or $\sum f(z) P(z)$ in discrete spaces. In general, we can talk about the $i$th moment as:
+
+$$ \mu_i (t) = E\left[ z^i \right] = \sum_{z=0}^\infty P(z,t) z^i$$
+
+ A probability distribution is uniquely defined by its full set of moments, and sometimes it is more conveniant or informative to talk about a system's moments than the contour of its distribution. Having access to these moments could eliminate the need to solve for the full distribution, depending on what information would be considered important. A special function, called the Moment Generating Function, is specifically intended for this purpose:
+$$M(\theta, t)=\sum_{z=0}^\infty e^{\theta z} P(z,t)$$
+By taking the Taylor expansion of $e^{\theta z}=1 + \frac{(\theta z)^1}{1!}+\frac{(\theta z)^2}{2!}+\frac{(\theta z)^3}{3!}+\cdots$, we can see the moments emerging from this function, the $i$th moment associated with the $i$th power of $\theta$:
+$$M(\theta, t)=\mu_0(t)+\frac{\mu_{1}(t)\theta}{1!}+\frac{\mu_{2}(t)\theta^2}{2!}+\cdots=\sum_{z=0}^\infty \frac{\mu_z(t)\theta^z}{z!}$$.
+
+The following equations will be used extensively in the following derivation, so it will be useful to define them now:
+\begin{align}
+ M(\theta, t)&=\sum_{z=0}^\infty e^{\theta z} P(z,t)=\sum_{z=0}^\infty \frac{\mu_z(t)\theta^z}{z!}\\
+ \frac{\partial M(\theta, t)}{\partial t} &=\sum_{z=0}^\infty e^{\theta z} \frac{\partial P(z,t)}{\partial t}\\
+  \frac{\partial^i M(\theta, t)}{\partial \theta^i} &=\sum_{z=0}^\infty e^{\theta z} P(z,t)  z^i=\sum_{z=0}^\infty \frac{\mu_z(t)\theta^{z-i}}{(z-i)!}
+\end{align}
+
+\section{The Chemical Master Equation}
+Since we will be uniquely considering the structure of the Chemical Master Equation, we would like to derive a general version of the Moment Generating Function which can be used for any system: we would simply have to plug in the specific values unique to that particular instance. The CME for $l$ reactions with stoichiometric change $v_l$ is:
+$$\frac{\partial P(z,t|z_0,t_0)}{\partial t} = \sum_l a_l(z-v_l)P(z-v_l,t) - a_l(z)P(z,t)a$$
+As we will see later on, the kind of rate laws associated with the system dramatically impact the complexity of the overall problem. We begin with the most simple case of kinetic mass action laws, following the derivation from \cite{1}. However, we would eventually like to take rational rate laws, such as Hill functions, as is seen in \cite{2}. An example of a mass action rate law is $a_l(z)= \frac{\lambda z_1(z_1-1)}{2}= \frac{\lambda}{2}z_1^2-\frac{\lambda}{2}z_1=\sum_i c_{l,i} a\prime_{l,i}$, where the law can be rewriten as a sum of coefficients $c_{l,i} $ and variables $a\prime_{l,i}$. This expanded, polynomial form will be exploited in our derivation.
+
+Since we would like to talk about moments of the CME rather than probabilities, our first priority is to write this equation in terms of $M$, rather than in terms of $P$. We multiply both sides by $e^{\theta z}$ and sum over all possible values of $z$:
+$$\sum_{z=0}^\infty e^{\theta z} \frac{\partial P(z,t)}{\partial t} = \sum_{z=0}^\infty \sum_l e^{\theta z} a_l(z-v_l)P(z-v_l,t) - e^{\theta z} a_l(z)P(z,t)$$
+The left hand side is equivalent to equation (1). For the second right hand term, we see the beginnings of functions of $M$. However, we must account for the variables of $a_l(z)$, $a\prime_{l,i}(z)$, by taking equation (2), in which these variables will come out to the $i$th power with $i$ derivatives, $i=\{i_1\cdots i_N\}$.
+\begin{align*}
+ \frac{\partial M(\theta, t)}{\partial t} &= \sum_{z=0}^\infty \sum_l \sum_i c_{l,i} a\prime_{l,i}(z-v_l) e^{\theta z} P(z-v_l,t) - \sum_i c_{l,i} a\prime_{l,i}(z) e^{\theta z} P(z,t)  \\
+ &= \sum_{z=0}^\infty \sum_l \sum_i c_{l,i} a\prime_{l,i}(z-v_l) e^{\theta (z-v_l)} e^{\theta (v_l)}P(z-v_l,t) - \sum_i c_{l,i} a\prime_{l,i}(z) e^{\theta z} P(z,t)  \\
+  &=  \sum_l \sum_i c_{l,i} \frac{\partial ^i M}{\partial \theta^i} e^{\theta (v_l)} - \sum_i c_{l,i} \frac{\partial ^i M}{\partial \theta^i} \\
+  &=  \sum_l \sum_i c_{l,i} \frac{\partial ^i M}{\partial \theta^i} \left(e^{\theta (v_l)}-1\right) 
+\end{align*}
+
+Now, we can take the second definition of $\frac{\partial ^i M}{\partial \theta^i}$ and expand $e^{\theta (v_l)}$ into its Taylor series. Notice that the summation, normally $\left[j=0\cdots \infty\right]$, now begins at $j=i$. When $j<i$, the index will be out of bounds and not correspond to any physical state.
+\begin{align*}
+ \frac{\partial M(\theta, t)}{\partial t} &= \sum_l \sum_i c_{l,i} \frac{\partial ^i M}{\partial \theta^i} \left(e^{\theta (v_l)}-1\right)\\
+ &= \sum_l \sum_i c_{l,i} \sum_{j=i}^\infty \frac{\mu_j(t)\theta^{j-i}}{(j-i)!}\left(\sum_{k=0}^\infty \frac{{(\theta v_l)}^k}{k!}-1\right)
+\end{align*}
+
+Remember that the initial goal was to isolate the coefficients of $\theta^n$ in order to obtain the $n$th moments:
+\begin{align*}
+ \frac{\partial M(\theta, t)}{\partial t} &= \sum_l \sum_i c_{l,i} \sum_{j=i}^\infty \frac{\mu_j(t)\theta^{j-i}}{(j-i)!} \left( \sum_{k=0}^\infty \frac{{(\theta v_l)}^k}{k!}-1 \right)\\
+&= \sum_l \sum_i c_{l,i} \left( \frac{\mu_i}{0!}+\frac{\mu_{i+1}\theta}{1!}+\frac{\mu_{i+2}\theta^2}{2!}+\cdots \right) \left(\frac{v_l \theta}{1!}+\frac{{(v_l \theta)}^2}{2!}+\frac{{(v_l \theta)}^3}{3!}+\cdots\right)\\
+ &= \sum_l \sum_i c_{l,i} \left( \left[\frac{\mu_i}{0!}\frac{v_l}{1!}\right]\theta+\left[\frac{\mu_{i}}{0!}\frac{{v_l}^2}{2!}+\frac{\mu_{i+1}}{1!}\frac{{v_l}}{1!}\right]\theta^2+\left[\frac{\mu_{i}}{0!}\frac{{v_l}^3}{3!}+\frac{\mu_{i+1}}{1!}\frac{{v_l}^2}{2!}+\frac{\mu_{i+2}}{2!}\frac{{v_l}}{1!}\right]\theta^3+\cdots\right)\\
+  &=\sum_l \sum_i c_{l,i} \sum_{n=0}^\infty \theta^n \sum_{k=1}^n \mu_{i+(n-k)} \frac{1}{k!(n-k)!}
+\end{align*}
+This is where my derivation separates from that of the paper, where the author has put $\frac{n!}{k!(n-k)!}$. I beleive that the original paper contains an error. Our next step will be isolate just the coefficients of $\theta$ in order to achieve a form in which we are creating ODE's of $\mu$ rather than $M(\theta, t)$. Since $\frac{\partial M(\theta, t)}{\partial t}=\sum_n \frac{\partial \mu_n}{\partial t}\frac{1}{n!}\theta^n$, 
+ we will have to multiply both sides by $n!$ in order to isolate $\mu$. Thus:
+  $$ \frac{\partial \mu_n(t)}{\partial t}=\sum_l \sum_i c_{l,i} \sum_{k=1}^n \mu_{i+(n-k)} \frac{n!}{k!(n-k)!}$$
+
+  
+ \section{Example}
+ We will use the same example as found in the original paper, a reversible dimerisation with mass action rate laws. The system is as follows:
+ \begin{align*}
+  2X\rightarrow^{k1}Y\\
+   Y\rightarrow^{k2}2X\\
+ \end{align*}
+ For conveniance, we will only try to solve for moments in $X$, noting that $X_0= X-2Y$ is the total number of $X$ molecules, bound or unbound. To write the mass action laws for the two reactions is relatively simple. For the first reaction, two unique $X$ molecules must be chosen, noting that the combination is symmetric. The second only depends on the presence of $Y$, or $\frac{(X_0-X)}{2}$.
+ \begin{align*}
+   a_{1}&=\frac{k_1 X(X-1)}{2}\\
+  a_{2}&=\frac{k_2 (X_0-X)}{2}
+ \end{align*}
+The coefficients can then be isolated:
+$$ c_{l,i}=\begin{cases}
+                  &l=1,i=1: \frac{-k_1}{2}\\
+                  &l=1,i=2: \frac{k_1}{2}\\
+                  &l=2,i=0: \frac{k_2 X_0}{2}\\
+                   &l=1,i=1: \frac{-k_2}{2}\\
+                 \end{cases}$$
+We also know the stoichiometric changes. The first reaction will cause the system to loose two $X$, $v_1=-2$, and the second to gain them back $v_2=2$. Now, we only have to plug these values into our equations for the first and second moments. It should be noted that the ``zero'' moment, $\mu_0$ is the summation of all probabilities, or $1$.
+
+\begin{align*}
+ \frac{\partial \mu_1(t)}{\partial t}&=\sum_l \sum_i c_{l,i} \mu_{i}\\
+ &= c_{1,0}v_1\mu_0+c_{1,1}v_1\mu_1+c_{1,2}v_1\mu_2+c_{2,0}v_2\mu_0+c_{2,1}v_2\mu_1+c_{2,2}v_2\mu_2\\
+ &= \frac{-k_1}{2}(-2)\mu_1 +\frac{k_1}{2}(-2)\mu_2+\frac{k_2 X_0}{2}(2)\mu_0+\frac{-k_2}{2}(2)\mu_1\\
+ &= k_1(\mu_1-\mu_2)+k_2(X_0 - \mu_1)
+\end{align*}
+
+
+ 
+ 
+ \begin{thebibliography}{}
+ \bibitem{1}	Gillespie, Colin S. "Moment-closure approximations for mass-action models." IET systems biology 3.1 (2009): 52-58.
+\bibitem{2} Milner, Peter, Colin S. Gillespie, and Darren J. Wilkinson. "Moment closure approximations for stochastic kinetic models with rational rate laws." Mathematical biosciences 231.2 (2011): 99-104.
+
+\end{thebibliography}
+ 
+ \end{document}
