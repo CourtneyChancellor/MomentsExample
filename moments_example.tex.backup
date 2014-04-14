@@ -54,7 +54,7 @@ Remember that the initial goal was to isolate the coefficients of $\theta^n$ in 
 \end{align*}
 This is where my derivation separates from that of the paper, where the author has put $\frac{n!}{k!(n-k)!}$. I beleive that the original paper contains an error. Our next step will be isolate just the coefficients of $\theta$ in order to achieve a form in which we are creating ODE's of $\mu$ rather than $M(\theta, t)$. Since $\frac{\partial M(\theta, t)}{\partial t}=\sum_n \frac{\partial \mu_n}{\partial t}\frac{1}{n!}\theta^n$, 
  we will have to multiply both sides by $n!$ in order to isolate $\mu$. Thus:
-  $$ \frac{\partial \mu_n(t)}{\partial t}=\sum_l \sum_i c_{l,i} \sum_{k=1}^n \mu_{i+(n-k)} \frac{n!}{k!(n-k)!}$$
+  $$ \frac{\partial \mu_n(t)}{\partial t}=\sum_l \sum_i c_{l,i} \sum_{k=1}^n v_l^k \mu_{i+(n-k)} \frac{n!}{k!(n-k)!}$$
 
   
  \section{Example}
@@ -78,19 +78,79 @@ $$ c_{l,i}=\begin{cases}
 We also know the stoichiometric changes. The first reaction will cause the system to loose two $X$, $v_1=-2$, and the second to gain them back $v_2=2$. Now, we only have to plug these values into our equations for the first and second moments. It should be noted that the ``zero'' moment, $\mu_0$ is the summation of all probabilities, or $1$.
 
 \begin{align*}
- \frac{\partial \mu_1(t)}{\partial t}&=\sum_l \sum_i c_{l,i} \mu_{i}\\
+ \frac{\partial \mu_1(t)}{\partial t}&=\sum_l \sum_i c_{l,i} v_l \mu_{i}\\
  &= c_{1,0}v_1\mu_0+c_{1,1}v_1\mu_1+c_{1,2}v_1\mu_2+c_{2,0}v_2\mu_0+c_{2,1}v_2\mu_1+c_{2,2}v_2\mu_2\\
  &= \frac{-k_1}{2}(-2)\mu_1 +\frac{k_1}{2}(-2)\mu_2+\frac{k_2 X_0}{2}(2)\mu_0+\frac{-k_2}{2}(2)\mu_1\\
  &= k_1(\mu_1-\mu_2)+k_2(X_0 - \mu_1)
 \end{align*}
 
+\begin{align*}
+ \frac{\partial \mu_2 (t)}{\partial t} &= \sum_l \sum_i c_{l,i} \sum_{k=1}^2 v_l^k \mu_{i+(2-k)} \frac{2!}{k!(2-k)!}\\
+ &=\sum_l \sum_i c_{l,i} \left[ v_l \mu_{i+1} \frac{2!}{1!1!}+v_l^k \mu_{i} \frac{2!}{2!0!}\right]\\
+ &= c_{1,1}(v_l \mu_{2} 2!+v_l^2 \mu_1)+c_{1,2}(v_l \mu_{3} 2!+v_l^2 \mu_2)+c_{2,0}(v_l \mu_{1} 2!+v_l^2 \mu_0)+c_{2,1}(v_l \mu_{2} 2!+v_l^2 \mu_1)\\
+ &= \frac{-k_1}{2}(-4\mu_2+4\mu_1)+\frac{k_1}{2}(-4\mu_3+4\mu_2)+\frac{k_2 X_0}{2}(4\mu_1+4\mu_0)+\frac{-k_2}{2}(4\mu_2+4\mu_1)\\
+ &=2k_1(-\mu_1+2\mu_2-\mu_3)+2k_2(X_0+(X_0-1)\mu_1-\mu_2)
+\end{align*}
+ 
+ As we can see, each moment depends on some moments higher than itself. In order to solve a system of ordinary differential equations, we will need to obtain an equation for $\mu_3$, which will, in turn, call for an equation for $\mu_4$, etc. Since there are an infinite number of moments, we cannot continue this process. In order to make the problem approachable, we must \textit{close} the chain of dependance by creating relationships between the moments. 
+ 
+ \section{Moment Closure Relationships}
+ 
+ We must make some kind of assumption about the distribution of our system in order to advance in the problem. Some schemes, for example, assume that the standard deviation is very small compared to the mean, or the inverse. Others imagine that the system exists in a very large volume with large molecule counts. However, the most common closure schemes simply impose a particular distribution type on the data. In this case, it is sometimes easier to talk in terms of \textit{cumulants}, or arithmetic combinations of moments which are sometimes more informative than the raw moments themselves. 
+ 
+ \begin{align*}
+  \kappa_1 &= \mu_1 \\
+  \kappa_2 &= \mu_2 - \mu_1^2 \\
+  \kappa_3 &= \mu_3 - 3\mu_1\mu_1+2\mu_1^3
+ \end{align*}
+It is these cumulants, and not their raw moments, which most people are familiar with and are most used in analysis of biological systems. For example, for a normal distribution, the second cumulant is called the variance, the third skew, and the fourth kurtosis. Since Gaussian distributions are symmetric about their mean, cumulants from the third and onward are equal to zero, creating a very simple means of writing the third cumulant as a function of the first two. Here, we have performed three of the most common distribution matching moment closures: normal ( $\mu_3 = 3\mu_1\mu_1-2\mu_1^3$), poisson ($\mu_3=\mu_1+3\mu_1^2+\mu_1^3$), and log normal ($\mu_3=\frac{\mu_2}{\mu_1}^3$). Note that all of these closures attempt to stop the moment dependance at the same point: the third raw moment. This is known as the ``second order moment approximation'', or 2MA, and is widely used in the literature as the most direct path to the relevant information of the system: two desired moments, two differential equations. However, it is to be noted that \cite{3} recently proved that at least three moments, or the 3MA, is needed under certain closure schemes to provide accurate results. Here, we will continue to work with the 2MA, given the simplicity of the biochemical system at hand.
+\begin{figure}[h!]
+ \includegraphics[width=\textwidth,height=.7\textwidth]{three_fits.pdf}
+ \caption{Results from three distribution fitting closure schemes, normal, poisson, and lognormal, for their mean plus and minus one standard deviation. These figures suggest that the normal distribution may, in fact, be a good match for the data itself, especially when we compare our results to the ``true'' cumulants in Figure  \ref{true}.}
+ \label{threefit}
+\end{figure}
+In order to know whether these results are accurate, however, we must have something to comare them to. Since the chosen dimerisation system is so simple, we may return to the Chemical Master Equation notation which we have been trying so hard to avoid! The CME is directly solvable, resulting in the probability distribution shown in Figure \ref{true}. To obtain the moments from this PDF, we can use the most simple definition available: $\mu_i=\sum_{z=0}^\infty P(z,t) z^i$. As we can see, both the normal and lognormal closure schemes perform fairly well.
+\begin{figure}[h!]
+ \includegraphics[width=\textwidth,height=\textwidth]{cme_solution.pdf}
+ \caption{Results from directly solving the Chemical Master Equation associated with the dimerisation system illustrated in the previous section, shown here in 2D. From this distribution, we can directly extract the raw moments for the system, and thus the cumulants.}
+ \label{true}
+\end{figure}
 
- 
- 
+\subsection{Arbitrary Closure Schemes}
+Given the nature of biochemical systems, imposing a particular distribution form for all times is not a sound approach to obtaining moments as they evolve through time. We would like to consider arbitrary probability distributions, without any restrictions to shape which exclude skewed or multimodal phenomena. With this in mind, we would like to make some first steps in creating unbiased closure schemes which are informed by the data itself rather than assumptions about its distribution shape. \\
+
+From the Chemical Master Equation solution, shown in Figure \ref{true}, we are able to directly obtain all of the raw moments of the system, $\mu_1$, $\mu_2$, $\mu_3$, etc. Since we are taking on 2MA schemes, we wish to write the third moment as some function of the first two, $\mu_3=f\left(\mu_1, \mu_2\right)$. The most simple case is that when $f$ is a polynomial, for which we will only consider a handful of linear and nonlinear terms:
+$$f\left(\mu_1, \mu_2\right)= c_1 \mu_1+c_2 \mu_1^2+c_3 \mu_1^3+c_4 \mu_2+c_5 \mu_2^2+c_6\mu_2^3+ c_7 \mu_1 \mu_2 + c_8\mu_1^2 \mu_2 +c_9\mu_1 \mu_2^2 $$
+The coefficients to this polynomial can be fitted using the CME solution, taking each solution in time as a snapshot, the ensemble of which satisfies $\mu_3=F\left(\mu_1, \mu_2\right)*c$, where $F$ is the matrix of moment combinations throughout time and $c$ contains the coefficients of the polynomial. A ``best fit'' solution of $c$ can be obtained via linear least squares: $\hat{c}=inv\left(F^TF\right) F^T \mu_3$. The result is a moment closure scheme informed purely by the system itself. \\
+
+However, this closure was taken for a given set of reaction rate parameters, $k_1=0.0166$ and $k_2=0.2$, and initial condition $X_0=301$. While it is most certainly well informed in this particular case, it is not obvious that this same closure scheme will be true for different parameters which change the overall dynamics of the system, or for which the probability distribution is a function of states and parameters, $\Phi(X,k_1,k_2)$. However, when we apply the polynomial closure scheme $\mu_3=f\left(\mu_1, \mu_2\right)$ with varying parameters, we see that the overall fit remains relatively good, with some special behaviors manifesting themselves as the rate parameters approach zero, see Figure \ref{errors}. Also noteworthy is the fact that the error seems to be a scaled function over a particular parameter, in this case, a function of $k_2$ which is simply scaled for values of $k_1$. If this is present in other biochemical systems, closures could be corrected by scaling terms according to the relationship between the parameters themselves.
+\begin{figure}[h!]
+ \includegraphics[width=.5\textwidth,height=.5\textwidth]{mean_errpr.pdf}
+  \includegraphics[width=.5\textwidth,height=.5\textwidth]{std_error.pdf}
+ \caption{Errors in mean (right) and standard deviation (left) for multiple parameter sets. Special behaviors present themselves when $k_2$, or the rate for the reverse reaction, tends to zero. There seems to be an inverse relationship in the fit for mean and variance.}
+ \label{errors}
+\end{figure}
+Given these first results, a potential work flow could go as follows:
+For any given system
+\begin{itemize}
+ \item Approximate Chemical Master Equation solution, using PGD, for example, to fit polynomial closure schemes for only one set of parameters
+ \item Use this closure scheme to obtain results for any set of parameters
+ \item Include corrections to scale error down to minimum
+\end{itemize}
+
+\section{Looking Forward on Moment Closure as Applied to BioInformatics}
+Now that we have explored Moment Closure, both in a literature review and in practice, I beleive that it is appropriate to take a wider perspective on its potential as a numerical and analysis tool in the field of bioinformatics. My opinion in this matter is twofold in that I see a large potential for biochemical networks but remain unconvinced for genetic regulatory networks. \\
+
+For biochemical networks, that is, networks which can be expressed in terms of stoichiometric reactions, the results seem promising. In the case of polynomial (mass action) rate laws, the construction of the differential equations themselves are relatively straightforward and have been automated in a Matlab toolbox illustrated in \cite{3} and a SBML/Python library illustrated in \cite{1}. Several potential applications of the workflow outlined in the previous section are possible, although, in my option, one of the most interesting is in simulation. Decomposition of a system into fast, deterministic reactions and slow, stochastic Markov events is relatively common. However, by representing the deterministic portion by moments, we are able to maintain the stochastic nature of the reactions while still being able to quickly produce accurate solutions in intermediate time scales. Results for systems of rational rate laws are still unsure: in \cite{2}, the authors conclude that the very form of the differential equations produced by the moment generating function may be impossible to solve as the number of interacting species grows: for example, for the first moment of a system of $N$ speices, we obtain a single differential equation with $N$ unknowns. Moreover, it is not clear in the literature how well moment closure performs in the context of multimodal  or oscillating systems, a crutial element of biological regulation.\\
+
+Gene Regulatory Networks, however, are more precarious: not only are all reactions represented by rational rate laws (Hill or sigmoidal functions) and often dependent on multimodal or oscillating dynamics, but the very structure of the system may prohibit a representation by moments, espeically if we consider a discrete syntax. While it is true that the CME is discrete in that species are taken in the form of whole number molecule counts, the notion of its probablity distribution remains relatively unchanged as this distribution is always a multivariate: each species recieves one mean, for example, over the full extent of its possible values. However, discrete, qualitative networks are represented by a Bernoulli distribution. This means that each species is truely represented by a certain numer of sublevels, each of which requires its own set of moments which are dependent not only on one another, but also on the sublevels of other connected species. This dependancy may lead to an explonential explosion such that the very production of differential moment equations is impossible. \\
+
+As a whole, I do not see Moment Closure as a sound approach to qualitative networks. If I continue on this same path for the remainder of my thesis, I will need to create stronger ties to qualitative networks, either by considering hybrid Boolean-differential systems or hybrid differential-stochastic systems. Else, I feel as though this work somewhat deviates from the original efforts, all of which were focused around qualitative systems, especially Process Hitting. That said, I am interested in hearing your options about this potential avenue of research at our next meeting!
+
  \begin{thebibliography}{}
  \bibitem{1}	Gillespie, Colin S. "Moment-closure approximations for mass-action models." IET systems biology 3.1 (2009): 52-58.
 \bibitem{2} Milner, Peter, Colin S. Gillespie, and Darren J. Wilkinson. "Moment closure approximations for stochastic kinetic models with rational rate laws." Mathematical biosciences 231.2 (2011): 99-104.
-
+\bibitem{3} Hespanha, Joao. "Moment closure for biochemical networks." Communications, Control and Signal Processing, 2008. ISCCSP 2008. 3rd International Symposium on IEEE. (2008): 142-147.
 \end{thebibliography}
  
  \end{document}
